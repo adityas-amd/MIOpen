@@ -34,8 +34,8 @@
     },
     "predict_type": 0,
     "num_tuning_params": {
-        "fwd": 15,
-        "bwd": 15,
-        "wrw": 15        
+        "fwd": 9,
+        "bwd": 9,
+        "wrw": 9        
     }
 }

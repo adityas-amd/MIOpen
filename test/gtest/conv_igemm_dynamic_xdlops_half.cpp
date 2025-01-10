@@ -25,6 +25,7 @@
  *******************************************************************************/
 #include <tuple>
 #include <miopen/miopen.h>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "../conv2d.hpp"
 #include "get_handle.hpp"
@@ -91,8 +92,16 @@ void Run2dDriver(miopenDataType_t prec)
                        [](const std::string& str) { return str.data(); });
 
         testing::internal::CaptureStderr();
+        testing::internal::CaptureStdout();
+
         test_drive<conv2d_driver>(ptrs.size(), ptrs.data());
-        auto capture = testing::internal::GetCapturedStderr();
+
+        auto captureErr = testing::internal::GetCapturedStderr();
+        EXPECT_THAT(captureErr, ::testing::Not(::testing::HasSubstr("FAILED")));
+        std::cout << captureErr;
+
+        auto capture = testing::internal::GetCapturedStdout();
+        EXPECT_THAT(capture, ::testing::Not(::testing::HasSubstr("FAILED")));
         std::cout << capture;
     }
 };

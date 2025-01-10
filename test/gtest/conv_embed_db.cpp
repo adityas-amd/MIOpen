@@ -26,6 +26,7 @@
 #include <tuple>
 
 #include <miopen/miopen.h>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <miopen/miopen.h>
 #include <miopen/env.hpp>
@@ -89,8 +90,16 @@ void Run2dDriver(miopenDataType_t prec)
         });
 
         testing::internal::CaptureStderr();
+        testing::internal::CaptureStdout();
+
         test_drive<conv2d_driver>(ptrs.size(), ptrs.data(), "test_conv_embed_db");
-        auto capture = testing::internal::GetCapturedStderr();
+
+        auto captureErr = testing::internal::GetCapturedStderr();
+        EXPECT_THAT(captureErr, ::testing::Not(::testing::HasSubstr("FAILED")));
+        EXPECT_FALSE(captureErr.find("Perf Db: record not found") != std::string::npos);
+
+        auto capture = testing::internal::GetCapturedStdout();
+        EXPECT_THAT(capture, ::testing::Not(::testing::HasSubstr("FAILED")));
         EXPECT_FALSE(capture.find("Perf Db: record not found") != std::string::npos);
     }
 };

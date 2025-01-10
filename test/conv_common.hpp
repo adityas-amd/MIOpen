@@ -251,6 +251,7 @@ struct conv_base
         std::cout << "Weights tensor: " << weights.desc.ToString() << std::endl;
         std::cout << "Output tensor: " << out.desc.ToString() << std::endl;
         std::cout << "Filter: " << filter << std::endl;
+        std::cout << "FAILED" << std::endl;
     }
 
 protected:

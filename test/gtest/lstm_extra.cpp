@@ -26,8 +26,9 @@
 
 #include "lstm.hpp"
 #include "get_handle.hpp"
-#include <gtest/gtest_common.hpp>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <gtest/gtest_common.hpp>
 #include <boost/algorithm/string.hpp>
 
 namespace env = miopen::env;
@@ -116,8 +117,16 @@ void Run2dDriver(miopenDataType_t prec)
             return str.data();
         });
         testing::internal::CaptureStderr();
+        testing::internal::CaptureStdout();
+
         test_drive<lstm_driver>(ptrs.size(), ptrs.data());
-        auto capture = testing::internal::GetCapturedStderr();
+
+        auto captureErr = testing::internal::GetCapturedStderr();
+        EXPECT_THAT(captureErr, ::testing::Not(::testing::HasSubstr("FAILED")));
+        std::cout << captureErr;
+
+        auto capture = testing::internal::GetCapturedStdout();
+        EXPECT_THAT(capture, ::testing::Not(::testing::HasSubstr("FAILED")));
         std::cout << capture;
     }
 };

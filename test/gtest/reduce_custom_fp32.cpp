@@ -25,8 +25,9 @@
  *******************************************************************************/
 #include "../reduce_test.hpp"
 #include <miopen/miopen.h>
-#include <gtest/gtest_common.hpp>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <gtest/gtest_common.hpp>
 #include "get_handle.hpp"
 
 namespace reduce_custom_fp32 {
@@ -90,10 +91,19 @@ void Run2dDriver(void)
         std::transform(tokens.begin(), tokens.end(), std::back_inserter(ptrs), [](const auto& str) {
             return str.data();
         });
+
         testing::internal::CaptureStderr();
+        testing::internal::CaptureStdout();
+
         test_drive<reduce_driver>(ptrs.size(), ptrs.data());
-        auto capture = testing::internal::GetCapturedStderr();
+
+        auto capture = testing::internal::GetCapturedStdout();
+        EXPECT_THAT(capture, ::testing::Not(::testing::HasSubstr("FAILED")));
         std::cout << capture;
+
+        auto captureErr = testing::internal::GetCapturedStderr();
+        EXPECT_THAT(captureErr, ::testing::Not(::testing::HasSubstr("FAILED")));
+        std::cout << captureErr;
     }
 };
 

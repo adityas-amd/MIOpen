@@ -24,6 +24,7 @@
  *
  *******************************************************************************/
 #include <miopen/miopen.h>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "../rnn_vanilla.hpp"
 #include "get_handle.hpp"
@@ -61,9 +62,17 @@ void Run2dDriverFloat(void)
         });
 
         testing::internal::CaptureStderr();
+        testing::internal::CaptureStdout();
+
         test_drive<rnn_vanilla_driver>(ptrs.size(), ptrs.data(), "rnn_extra");
-        auto capture = testing::internal::GetCapturedStderr();
+
+        auto capture = testing::internal::GetCapturedStdout();
+        EXPECT_THAT(capture, ::testing::Not(::testing::HasSubstr("FAILED")));
         std::cout << capture;
+
+        auto captureErr = testing::internal::GetCapturedStderr();
+        EXPECT_THAT(captureErr, ::testing::Not(::testing::HasSubstr("FAILED")));
+        std::cout << captureErr;
     }
 };
 

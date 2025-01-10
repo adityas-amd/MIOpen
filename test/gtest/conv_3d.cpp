@@ -25,8 +25,9 @@
  *******************************************************************************/
 #include "../conv3d.hpp"
 #include <miopen/miopen.h>
-#include <gtest/gtest_common.hpp>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <gtest/gtest_common.hpp>
 #include "get_handle.hpp"
 
 namespace conv_3d {
@@ -99,9 +100,15 @@ void Run2dDriver()
             return str.data();
         });
         testing::internal::CaptureStderr();
+        testing::internal::CaptureStdout();
+
         test_drive<conv3d_driver>(ptrs.size(), ptrs.data());
-        auto capture = testing::internal::GetCapturedStderr();
-        std::cout << capture;
+
+        auto capture = testing::internal::GetCapturedStdout();
+        EXPECT_THAT(capture, ::testing::Not(::testing::HasSubstr("FAILED")));
+
+        auto captureErr = testing::internal::GetCapturedStderr();
+        EXPECT_THAT(captureErr, ::testing::Not(::testing::HasSubstr("FAILED")));
     }
 };
 

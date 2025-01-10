@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <iostream>
 #include <iterator>
 #include <miopen/env.hpp>
@@ -38,7 +39,11 @@
 
 #include "../driver.hpp"
 
-inline void default_check(const std::string& err) { std::cout << err; }
+inline void default_check(const std::string& err)
+{
+    EXPECT_THAT(err, ::testing::Not(::testing::HasSubstr("FAILED")));
+    std::cout << err;
+}
 
 inline void tuning_check(const std::string& err)
 {
@@ -192,8 +197,12 @@ void invoke_with_params(Check&& check)
         });
 
         testing::internal::CaptureStderr();
+        testing::internal::CaptureStdOut();
+
         test_drive<Driver>(ptrs.size(), ptrs.data(), "unnamed");
+
         check(testing::internal::GetCapturedStderr());
+        check(testing::internal::GetCapturedStdout());
     }
 }
 

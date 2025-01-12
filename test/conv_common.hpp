@@ -1961,6 +1961,7 @@ struct conv_driver : test_driver
 
     void run()
     {
+        bool ran_driver = false;
         if(!input_dims.empty())
             filter.spatialDim = get_spatial_dim();
         else
@@ -2147,7 +2148,8 @@ struct conv_driver : test_driver
         if(is_int8 && filter.mode == miopenTranspose)
         {
             show_command();
-            std::cout << "MIOpen doesn't support int8 type transpose convolution." << std::endl;
+            std::cout << "FAILED: MIOpen doesn't support int8 type transpose convolution."
+                      << std::endl;
             return;
         }
 
@@ -2157,7 +2159,7 @@ struct conv_driver : test_driver
         if(is_bfloat16 && !(filter.spatialDim == 2))
         {
             show_command();
-            std::cout << "Skipped: bfloat16 is supported for 2D conv only" << std::endl;
+            std::cout << "FAILED: bfloat16 is supported for 2D conv only" << std::endl;
             return;
         }
 
@@ -2177,7 +2179,7 @@ struct conv_driver : test_driver
                     if(miopen::any_of(filter.GetConvStrides(), [](auto v) { return v == 0; }))
                     {
                         show_command();
-                        std::cout << "Skipped: stride[i] == 0" << std::endl;
+                        std::cout << "FAILED: stride[i] == 0" << std::endl;
                         return;
                     }
 
@@ -2206,7 +2208,7 @@ struct conv_driver : test_driver
                     if(miopen::any_of(out_spatial_len, [](auto v) { return v <= 0; }))
                     {
                         show_command();
-                        std::cout << "Skipped: out_spatial_len[i] <= 0" << std::endl;
+                        std::cout << "FAILED: out_spatial_len[i] <= 0" << std::endl;
                         return;
                     }
                 }
@@ -2215,7 +2217,7 @@ struct conv_driver : test_driver
                     if(miopen::any_of(filter.GetConvStrides(), [](auto v) { return v == 0; }))
                     {
                         show_command();
-                        std::cout << "Skipped: stride[i] == 0" << std::endl;
+                        std::cout << "FAILED: stride[i] == 0" << std::endl;
                         return;
                     }
 
@@ -2234,7 +2236,7 @@ struct conv_driver : test_driver
                     if(miopen::any_of(out_spatial_len, [](auto v) { return v <= 0; }))
                     {
                         show_command();
-                        std::cout << "Skipped: out_spatial_len[i] <= 0" << std::endl;
+                        std::cout << "FAILED: out_spatial_len[i] <= 0" << std::endl;
                         return;
                     }
                 }
@@ -2293,7 +2295,8 @@ struct conv_driver : test_driver
                 if(input.desc.GetType() == miopenInt8 || input.desc.GetType() == miopenBFloat16)
                 {
                     show_command();
-                    std::cout << "Direct path doesn't support Int8 or BFloat16 type." << std::endl;
+                    std::cout << "FAILED: Direct path doesn't support Int8 or BFloat16 type."
+                              << std::endl;
                     return;
                 }
                 if(input.desc.GetType() == miopenHalf && filter.mode == miopenConvolution)
@@ -2378,7 +2381,7 @@ struct conv_driver : test_driver
                 if(total_mem >= device_mem)
                 {
                     show_command();
-                    std::cout << "Config requires " << total_mem
+                    std::cout << "FAILED: Config requires " << total_mem
                               << " Bytes to write all necessary tensors to GPU. GPU has "
                               << device_mem << " Bytes of memory." << std::endl;
                     return;
@@ -2393,6 +2396,7 @@ struct conv_driver : test_driver
 
                 if(do_forward && !skip_forward)
                 {
+                    ran_driver = true;
                     if(is_int8)
                     {
                         if(output_type == "float")
@@ -2450,18 +2454,26 @@ struct conv_driver : test_driver
 
                 if(do_backward_data && !skip_backward_data)
                 {
+                    ran_driver = true;
                     verify(verify_backward_conv<api, T>{
                         input, weights, output, filter, stats, preallocate, 0, search});
                 }
 
                 if(do_backward_weights && !skip_backward_weights)
                 {
+                    ran_driver = true;
                     output.generate(gen_sign_value);
 
                     verify(verify_backward_weights_conv<api, T>{
                         input, weights, output, filter, stats, preallocate, 0, search});
                 }
             }
+        }
+
+        if(!ran_driver)
+        {
+            show_command();
+            std::cout << "FAILED: driver didn't run" << std::endl;
         }
     }
 };

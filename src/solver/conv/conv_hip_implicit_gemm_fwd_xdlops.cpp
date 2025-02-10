@@ -272,41 +272,77 @@ bool ConvHipImplicitGemmFwdXdlops::IsApplicable(
     [[maybe_unused]] const ProblemDescription& problem) const
 {
 #if MIOPEN_BACKEND_HIP && MIOPEN_USE_COMPOSABLEKERNEL
-    if(env::disabled(MIOPEN_DEBUG_CONV_IMPLICIT_GEMM_HIP_FWD_XDLOPS))
+    if(env::disabled(MIOPEN_DEBUG_CONV_IMPLICIT_GEMM_HIP_FWD_XDLOPS)) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: env::disabled");
         return false;
-    if(problem.GetConv().attribute.deterministic)
+    }
+    if(problem.GetConv().attribute.deterministic) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: problem.GetConv().attribute.deterministic");
         return false;
-    if(problem.HasNonPackedTensors())
+    }
+    if(problem.HasNonPackedTensors()) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: HasNonPackedTensors");
         return false;
-    if(!problem.AllTensorsDimsFitIntoInt())
+    }
+    if(!problem.AllTensorsDimsFitIntoInt()) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: AllTensorsDimsFitIntoInt");
         return false;
-    if(problem.HasMixedDataTypes())
+    }
+    if(problem.HasMixedDataTypes()) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: HasNonPackedTensors");
         return false;
-    if(!problem.IsDirectionForward())
+    }
+    if(!problem.IsDirectionForward()) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: !IsDirectionForward");
         return false;
-    if(!problem.Is2d())
+    }
+    if(!problem.Is2d()) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: !Is2d");
         return false;
-    if(!IsXdlopsSupport(ctx))
+    }
+    if(!IsXdlopsSupport(ctx)) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: !IsXdlopsSupport");
         return false;
-    if(!IsComposableKernelSupportedHardware(ctx))
+    }
+    if(!IsComposableKernelSupportedHardware(ctx)) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: !IsComposableKernelSupportedHardware");
         return false;
+    }
     const std::string& arch = ctx.GetStream().GetDeviceName();
-    if(arch == "gfx90a" && problem.IsGfx90aFp16altRequired())
+    if(arch == "gfx90a" && problem.IsGfx90aFp16altRequired()) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: gfx90a");
         return false;
-    if(!IsIndexRangeLargeEnough(problem))
+    }
+    if(!IsIndexRangeLargeEnough(problem)) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: !IsIndexRangeLargeEnough");
         return false;
-    if(!problem.IsLayoutNHWC())
+    }
+    if(!problem.IsLayoutNHWC()) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: !IsLayoutNHWC");
         return false;
-    if(problem.IsTensorsCasted())
+    }
+    if(problem.IsTensorsCasted()) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: !IsTensorCasted");
         return false;
-    if(problem.GetGroupCount() > 1)
+    }
+    if(problem.GetGroupCount() > 1) {
+        MIOPEN_LOG_I2("IsApplicable() -> false: GetGroupCount > 1");
         return false;
+    }
     switch(problem.GetInDataType())
     {
-    case miopenInt8: return CheckCKApplicability<int8_t>(problem);
-    case miopenHalf: return CheckCKApplicability<ck::half_t>(problem);
-    case miopenFloat: return CheckCKApplicability<float>(problem);
-    case miopenBFloat16: return CheckCKApplicability<ck::bhalf_t>(problem);
+    case miopenInt8: 
+        MIOPEN_LOG_I2("IsApplicable() -> case miopenInt8");
+        return CheckCKApplicability<int8_t>(problem);
+    case miopenHalf: 
+        MIOPEN_LOG_I2("IsApplicable() -> case miopenHalf");
+        return CheckCKApplicability<ck::half_t>(problem);
+    case miopenFloat:
+        MIOPEN_LOG_I2("IsApplicable() -> case miopenFloat");
+        return CheckCKApplicability<float>(problem);
+    case miopenBFloat16: 
+        MIOPEN_LOG_I2("IsApplicable() -> case miopenBFloat16");
+        return CheckCKApplicability<ck::bhalf_t>(problem);
     case miopenFloat8:
     case miopenBFloat8:
     case miopenInt64:

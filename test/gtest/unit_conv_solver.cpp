@@ -766,7 +766,7 @@ void UnitTestConvSolverDevApplicabilityBase::RunTestImpl(
     for(const auto& [dev, dev_descr] : all_known_devs)
     {
         const auto supported = IsDeviceSupported(params.supported_devs, dev);
-        // std::cout << "Test " << dev_descr << " (supported: " << supported << ")" << std::endl;
+        std::cout << "Test " << dev_descr << " (supported: " << supported << ")" << std::endl;
 
         auto handle    = MockHandle{dev_descr};
         const auto ctx = [&] {
@@ -776,7 +776,7 @@ void UnitTestConvSolverDevApplicabilityBase::RunTestImpl(
         }();
 
         const auto is_applicable = solver.IsApplicable(ctx, problem);
-        // std::cout << "IsApplicable: " << is_applicable << std::endl;
+        std::cout << "IsApplicable: " << is_applicable << std::endl;
         if(is_applicable != supported)
         {
             GTEST_FAIL() << dev_descr << " is" << (is_applicable ? "" : " not")

@@ -67,6 +67,10 @@ pipeline {
             defaultValue: true,
             description: "")
         booleanParam(
+            name: "BUILD_SINGLE_GTEST",
+            defaultValue: env.BRANCH_NAME == "AD/CodeCov" ? true : false,
+            description: "Builds the single gtest binary and runs code coverage on those tests")
+        booleanParam(
             name: "BUILD_PACKAGES",
             defaultValue: true,
             description: "")
@@ -156,7 +160,7 @@ pipeline {
     stages{
         stage('Build Docker'){
             when {
-                expression { params.BUILD_DOCKER && params.TARGET_NOGPU && params.DATATYPE_NA }
+                expression { params.BUILD_DOCKER && params.TARGET_NOGPU && params.DATATYPE_NA && !params.BUILD_SINGLE_GTEST }
             }
             agent{ label rocmnode("gfx90a") }
             steps{
@@ -167,7 +171,7 @@ pipeline {
         }
         stage("Packages") {
             when {
-                expression { params.BUILD_PACKAGES && params.TARGET_NOGPU && params.DATATYPE_NA }
+                expression { params.BUILD_PACKAGES && params.TARGET_NOGPU && params.DATATYPE_NA && !params.BUILD_SINGLE_GTEST }
             }
             parallel {
                 stage("HIP Package") {
@@ -182,7 +186,7 @@ pipeline {
         }
         stage("Static checks") {
             when {
-                expression { params.BUILD_STATIC_CHECKS && params.TARGET_NOGPU && params.DATATYPE_NA }
+                expression { params.BUILD_STATIC_CHECKS && params.TARGET_NOGPU && params.DATATYPE_NA && !params.BUILD_SINGLE_GTEST }
             }
             parallel{
                 stage('Hip Tidy') {
@@ -260,7 +264,7 @@ pipeline {
         }
         stage("Smoke Fp32") {
             when {
-                expression { params.BUILD_SMOKE_FP32 && params.DATATYPE_FP32 }
+                expression { params.BUILD_SMOKE_FP32 && params.DATATYPE_FP32 && !params.BUILD_SINGLE_GTEST }
             }
             parallel{
                 stage('Fp32 Hip gfx90a') {
@@ -327,7 +331,7 @@ pipeline {
         }
         stage("Smoke Aux 1") {
             when {
-                expression { params.BUILD_SMOKE_AUX1 && params.DATATYPE_FP32 }
+                expression { params.BUILD_SMOKE_AUX1 && params.DATATYPE_FP32 && !params.BUILD_SINGLE_GTEST }
             }
             parallel{
                 stage('Fp32 Hip Debug NOCOMGR gfx90a') {
@@ -505,7 +509,7 @@ pipeline {
         }
         stage("Smoke Fp16/Bf16/Int8") {
             when {
-                expression { params.BUILD_SMOKE_FP16_BF16_INT8 }
+                expression { params.BUILD_SMOKE_FP16_BF16_INT8 && !params.BUILD_SINGLE_GTEST }
             }
             parallel{
                 stage('Fp16 Hip Vega20') {
@@ -632,7 +636,7 @@ pipeline {
         }
         stage("Full Tests") {
             when {
-                expression { params.BUILD_FULL_TESTS}
+                expression { params.BUILD_FULL_TESTS && !params.BUILD_SINGLE_GTEST}
             }
             environment{
                 // WORKAROUND_ISSUE_1148: "CTEST_PARALLEL_LEVEL=2"
@@ -954,6 +958,20 @@ pipeline {
                             utils.buildHipClangJobAndReboot(setup_flags: Full_test + Fp16_flags, build_install: true, needs_reboot:false)
                         }
                     }
+                }
+            }
+        }
+        stage('Single GTest'){
+            when {
+                beforeAgent true
+                expression { params.BUILD_SINGLE_GTEST }
+            }
+            agent{ label rocmnode("gfx90a") }
+            steps{
+                echo "Building single gtest binary: ${params.BUILD_SINGLE_GTEST}"
+                script {
+                    currentBuild.description = "SingleGtestBinary"
+                    // utils.buildHipClangJobAndReboot(setup_flags: Full_test, needs_reboot:false)
                 }
             }
         }

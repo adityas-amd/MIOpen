@@ -978,7 +978,7 @@ pipeline {
                 echo "Building single gtest binary: ${params.BUILD_SINGLE_GTEST}"
                 script {
                     currentBuild.description = "SingleGtestBinary + coverage"
-                    utils.buildHipClangJobAndReboot(setup_flags: coverage_flags + gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, needs_reboot:false )
+                    utils.buildHipClangJobAndReboot(setup_flags: coverage_flags + gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true needs_reboot:false )
                     sh "ls -la"
                 }
             }

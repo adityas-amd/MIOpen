@@ -161,6 +161,27 @@ def cmake_build(Map conf=[:]){
         archiveArtifacts artifacts: "build/*.rpm", allowEmptyArchive: true, fingerprint: true
         stash includes: "build/*tar.gz", name: 'miopen_tar'
     }
+
+    def coverage_build = (conf.get("codecov",false) == true)
+
+    if (coverage_build == true) {
+        archiveArtifacts artifacts: "build/*.profraw", allowEmptyArchive: true, fingerprint: true
+        def coverage_profdata = """
+            ls -la
+            ls -la bin
+            /opt/rocm/llvm/bin/llvm-profdata merge -sparse ./**/*.profraw -o ./miopen.profdata
+            /opt/rocm/llvm/bin/llvm-cov report -object ./lib/libMIOpen.so -instr-profile=./miopen.profdata > ./code_cov_miopen.report
+            cat ./code_cov_miopen.report
+            /opt/rocm/llvm/bin/llvm-cov show -Xdemangler=/opt/rocm/llvm/bin/llvm-cxxfilt -object ./lib/libMIOpen.so -instr-profile=./miopen.profdata > ./code_cov_miopen.txt
+            cat ./code_cov_miopen.txt
+        """
+
+        sh coverage_profdata
+
+        archiveArtifacts artifacts: "build/code_cov_miopen.report", allowEmptyArchive: true, fingerprint: true
+        archiveArtifacts artifacts: "build/code_cov_miopen.txt", allowEmptyArchive: true, fingerprint: true
+
+    }
 }
 
 def cmake_fin_build_cmd(prefixpath){

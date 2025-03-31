@@ -167,6 +167,7 @@ def cmake_build(Map conf=[:]){
     if (coverage_build == true) {
         archiveArtifacts artifacts: "build/*.profraw", allowEmptyArchive: true, fingerprint: true
         def coverage_profdata = """
+            cd build
             ls -la
             ls -la bin
             /opt/rocm/llvm/bin/llvm-profdata merge -sparse ./**/*.profraw -o ./miopen.profdata

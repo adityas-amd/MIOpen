@@ -967,11 +967,19 @@ pipeline {
                 expression { params.BUILD_SINGLE_GTEST }
             }
             agent{ label rocmnode("gfx90a") }
+            environment{
+                coverage_flags = " -DCMAKE_CXX_FLAGS='-fprofile-instr-generate -fcoverage-mapping'"
+                gtest_flags = " -DMIOPEN_TEST_DISCRETE=OFF"
+
+                build_command = "LLVM_PATH=/opt/rocm/llvm make -j\$(nproc) miopen_gtest"
+                execute_cmd_gtest = "bin/miopen_gtest --gtest_filter=GPU_TestMhaFind20_FP32.MhaForward"
+            }
             steps{
                 echo "Building single gtest binary: ${params.BUILD_SINGLE_GTEST}"
                 script {
-                    currentBuild.description = "SingleGtestBinary"
-                    // utils.buildHipClangJobAndReboot(setup_flags: Full_test, needs_reboot:false)
+                    currentBuild.description = "SingleGtestBinary + coverage"
+                    utils.buildHipClangJobAndReboot(setup_flags: coverage_flags + gtest_flags, build_cmd: Navi21_build_cmd, execute_cmd: execute_cmd_gtest, needs_reboot:false )
+                    sh "ls -la"
                 }
             }
         }

@@ -170,7 +170,7 @@ def cmake_build(Map conf=[:]){
             cd build
             ls -la
             ls -la bin
-            /opt/rocm/llvm/bin/llvm-profdata merge -sparse ./**/*.profraw -o ./miopen.profdata
+            /opt/rocm/llvm/bin/llvm-profdata merge -sparse ./*.profraw -o ./miopen.profdata
             /opt/rocm/llvm/bin/llvm-cov report -object ./lib/libMIOpen.so -instr-profile=./miopen.profdata > ./code_cov_miopen.report
             cat ./code_cov_miopen.report
             /opt/rocm/llvm/bin/llvm-cov show -Xdemangler=/opt/rocm/llvm/bin/llvm-cxxfilt -object ./lib/libMIOpen.so -instr-profile=./miopen.profdata > ./code_cov_miopen.txt

@@ -972,14 +972,13 @@ pipeline {
                 gtest_flags = " -DMIOPEN_TEST_DISCRETE=OFF"
 
                 build_command = "LLVM_PATH=/opt/rocm/llvm make -j\$(nproc) miopen_gtest"
-                execute_cmd_gtest = "bin/miopen_gtest --gtest_filter=GPU_TestMhaFind20_FP32.MhaForward"
+                execute_cmd_gtest = "bin/miopen_gtest --gtest_filter=-*DBSync*:*DeepBench*:*MIOpenTestConv*"
             }
             steps{
                 echo "Building single gtest binary: ${params.BUILD_SINGLE_GTEST}"
                 script {
                     currentBuild.description = "SingleGtestBinary + coverage"
                     utils.buildHipClangJobAndReboot(setup_flags: coverage_flags + gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true, needs_reboot:false )
-                    sh "ls -la"
                 }
             }
         }

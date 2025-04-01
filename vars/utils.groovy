@@ -163,7 +163,6 @@ def cmake_build(Map conf=[:]){
     }
 
     def coverage_build = (conf.get("codecov",false) == true)
-
     if (coverage_build == true) {
         archiveArtifacts artifacts: "build/*.profraw", allowEmptyArchive: true, fingerprint: true
         def coverage_profdata = """
@@ -326,6 +325,7 @@ def buildHipClangJob(Map conf=[:]){
 
         def needs_gpu = conf.get("needs_gpu", true)
         def lfs_pull = conf.get("lfs_pull", false)
+        def build_timeout = conf.get("build_timeout", 420)
 
         def retimage
         gitStatusWrapper(credentialsId: "${env.miopen_git_creds}", gitHubContext: "Jenkins - ${variant}", account: 'ROCm', repo: 'MIOpen') {
@@ -357,7 +357,7 @@ def buildHipClangJob(Map conf=[:]){
             }
 
             withDockerContainer(image: image, args: dockerOpts + ' -v=/var/jenkins/:/var/jenkins') {
-                timeout(time: 420, unit:'MINUTES')
+                timeout(time: build_timeout, unit:'MINUTES')
                 {
                     if (lfs_pull) {
                         sh "git lfs pull --exclude="

@@ -972,13 +972,18 @@ pipeline {
                 gtest_flags = " -DMIOPEN_TEST_DISCRETE=OFF"
 
                 build_command = "LLVM_PATH=/opt/rocm/llvm make -j\$(nproc) miopen_gtest"
-                execute_cmd_gtest = "bin/miopen_gtest --gtest_filter=-*DBSync*:*DeepBench*:*MIOpenTestConv*"
+                // execute_cmd_gtest = "bin/miopen_gtest --gtest_filter=-*DBSync*:*DeepBench*:*MIOpenTestConv*"
+                execute_cmd_gtest = "python3 ../gtest-parallel/gtest-parallel ./bin/miopen_gtest --gtest_filter=-*DBSync*:*DeepBench*:*MIOpenTestConv* --workers=3"
+
+                build_timeout_minutes = 720 // 12 hours
             }
             steps{
                 echo "Building single gtest binary: ${params.BUILD_SINGLE_GTEST}"
                 script {
+                    sh "git pull https://github.com/google/gtest-parallel.git"
+                    sh "ls"
                     currentBuild.description = "SingleGtestBinary + coverage"
-                    utils.buildHipClangJobAndReboot(setup_flags: coverage_flags + gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true, needs_reboot:false )
+                    utils.buildHipClangJobAndReboot(setup_flags: coverage_flags + gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true, needs_reboot:false, build_timeout:build_timeout_minutes )
                 }
             }
         }

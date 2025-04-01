@@ -980,7 +980,8 @@ pipeline {
             steps{
                 echo "Building single gtest binary: ${params.BUILD_SINGLE_GTEST}"
                 script {
-                    sh "git pull https://github.com/google/gtest-parallel.git"
+                    sh "wget https://github.com/google/gtest-parallel/archive/refs/heads/master.zip"
+                    sh "unzip master.zip -d ./gtest-parallel"
                     sh "ls"
                     currentBuild.description = "SingleGtestBinary + coverage"
                     utils.buildHipClangJobAndReboot(setup_flags: coverage_flags + gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true, needs_reboot:false, build_timeout:build_timeout_minutes )

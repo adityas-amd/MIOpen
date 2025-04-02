@@ -973,9 +973,9 @@ pipeline {
 
                 build_command = "LLVM_PATH=/opt/rocm/llvm make -j\$(nproc) miopen_gtest"
                 // execute_cmd_gtest = "bin/miopen_gtest --gtest_filter=-*DBSync*:*DeepBench*:*MIOpenTestConv*"
-                execute_cmd_gtest = "python3 ../gtest-parallel/gtest-parallel-master/gtest-parallel ./bin/miopen_gtest --gtest_filter=-*DBSync*:*DeepBench*:*MIOpenTestConv* --workers=3"
+                execute_cmd_gtest = "python3 ../gtest-parallel/gtest-parallel-master/gtest-parallel ./bin/miopen_gtest --gtest_filter=-*DBSync*:*DeepBench*:*MIOpenTestConv* --workers=4 --serialize_test_cases"
 
-                build_timeout_minutes = 720 // 12 hours
+                build_timeout_minutes = 2400 // 40 hours
             }
             steps{
                 echo "Building single gtest binary: ${params.BUILD_SINGLE_GTEST}"

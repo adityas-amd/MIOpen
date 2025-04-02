@@ -76,7 +76,7 @@ def cmake_build(Map conf=[:]){
         setup_args = " -DBUILD_DEV=Off -DCMAKE_INSTALL_PREFIX=${miopen_install_path}" + setup_args
     } else if(package_build == true) {
         setup_args = ' -DBUILD_DEV=Off' + setup_args
-    } else if() {
+    } else if(coverage_build == true) {
         setup_args = ' -DBUILD_DEV=Off' + setup_args
     } else {
         setup_args = ' -DBUILD_DEV=On' + setup_args

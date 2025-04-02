@@ -984,8 +984,9 @@ pipeline {
                     //sh "mkdir gtest-parallel"
                     //sh "tar zxvf master.tar.gz -C gtest-parallel"
                     //sh "ls"
+                    
                     currentBuild.description = "SingleGtestBinary + coverage"
-                    utils.buildHipClangJobAndReboot(setup_flags: coverage_flags + gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true, needs_reboot:false, build_timeout:build_timeout_minutes )
+                    utils.buildHipClangJobAndReboot(lfs_pull:true, setup_flags: coverage_flags + gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true, needs_reboot:false, build_timeout:build_timeout_minutes )
                 }
             }
         }

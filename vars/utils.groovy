@@ -62,7 +62,6 @@ def cmake_build(Map conf=[:]){
     def cmake_envs = "CXX=${compiler} CXXFLAGS='-Werror' " + conf.get("cmake_ex_env","")
 
     def package_build = (conf.get("package_build",false) == true)
-    def coverage_build = (conf.get("codecov",false) == true)
 
 
     if (package_build == true) {
@@ -75,8 +74,6 @@ def cmake_build(Map conf=[:]){
         make_targets = 'install ' + make_targets
         setup_args = " -DBUILD_DEV=Off -DCMAKE_INSTALL_PREFIX=${miopen_install_path}" + setup_args
     } else if(package_build == true) {
-        setup_args = ' -DBUILD_DEV=Off' + setup_args
-    } else if(coverage_build == true) {
         setup_args = ' -DBUILD_DEV=Off' + setup_args
     } else {
         setup_args = ' -DBUILD_DEV=On' + setup_args
@@ -166,6 +163,7 @@ def cmake_build(Map conf=[:]){
         stash includes: "build/*tar.gz", name: 'miopen_tar'
     }
 
+    def coverage_build = (conf.get("codecov",false) == true)
     if (coverage_build == true) {
         archiveArtifacts artifacts: "build/*.profraw", allowEmptyArchive: true, fingerprint: true
         def coverage_profdata = """

@@ -969,7 +969,6 @@ pipeline {
             agent{ label rocmnode("gfx90a") }
             environment{
                 // coverage_flags = " -DCMAKE_CXX_FLAGS='-fprofile-instr-generate -fcoverage-mapping'"
-                coverage_flags = ""
                 gtest_flags = " -DMIOPEN_TEST_DISCRETE=OFF"
 
                 build_command = "LLVM_PATH=/opt/rocm/llvm make -j\$(nproc) miopen_gtest"
@@ -987,7 +986,7 @@ pipeline {
                     //sh "ls"
                     
                     currentBuild.description = "SingleGtestBinary + coverage"
-                    utils.buildHipClangJobAndReboot(lfs_pull:true, setup_flags: coverage_flags + gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true, needs_reboot:false, build_timeout:build_timeout_minutes )
+                    utils.buildHipClangJobAndReboot(lfs_pull:true, setup_flags: gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true, needs_reboot:false, build_timeout:build_timeout_minutes )
                 }
             }
         }

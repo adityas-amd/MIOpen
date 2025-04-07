@@ -968,7 +968,8 @@ pipeline {
             }
             agent{ label rocmnode("gfx90a") }
             environment{
-                coverage_flags = " -DCMAKE_CXX_FLAGS='-fprofile-instr-generate -fcoverage-mapping'"
+                // coverage_flags = " -DCMAKE_CXX_FLAGS='-fprofile-instr-generate -fcoverage-mapping'"
+                coverage_flags = ""
                 gtest_flags = " -DMIOPEN_TEST_DISCRETE=OFF"
 
                 build_command = "LLVM_PATH=/opt/rocm/llvm make -j\$(nproc) miopen_gtest"

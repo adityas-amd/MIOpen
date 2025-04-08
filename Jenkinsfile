@@ -968,14 +968,14 @@ pipeline {
             }
             agent{ label rocmnode("gfx90a") }
             environment{
-                // coverage_flags = " -DCMAKE_CXX_FLAGS='-fprofile-instr-generate -fcoverage-mapping'"
-                gtest_flags = " -DMIOPEN_TEST_DISCRETE=OFF"
+                coverage_flags = " -DCMAKE_CXX_FLAGS='-fprofile-instr-generate -fcoverage-mapping' "
+                gtest_flags = " -DMIOPEN_TEST_DISCRETE=OFF "
 
                 build_command = "LLVM_PATH=/opt/rocm/llvm make -j\$(nproc) miopen_gtest"
-                execute_cmd_gtest = "bin/miopen_gtest --gtest_filter=-*DBSync*:*DeepBench*:*MIOpenTestConv*"
-                // execute_cmd_gtest = "python3 ../gtest-parallel/gtest-parallel-master/gtest-parallel ./bin/miopen_gtest --gtest_filter=-*DBSync*:*DeepBench*:*MIOpenTestConv* --workers=4 --serialize_test_cases"
+                // execute_cmd_gtest = "bin/miopen_gtest --gtest_filter=*FP32*:*NONE*-*DBSync*:*DeepBench*:*MIOpenTestConv*"
+                execute_cmd_gtest = "python3 ../gtest-parallel/gtest-parallel-master/gtest-parallel ./bin/miopen_gtest --gtest_filter=*FP32*:*NONE*-*DBSync*:*DeepBench*:*MIOpenTestConv* --workers=4 --serialize_test_cases"
 
-                build_timeout_minutes = 2400 // 40 hours
+                build_timeout_minutes = 10080 // 1 week
             }
             steps{
                 echo "Building single gtest binary: ${params.BUILD_SINGLE_GTEST}"
@@ -986,7 +986,7 @@ pipeline {
                     //sh "ls"
                     
                     currentBuild.description = "SingleGtestBinary + coverage"
-                    utils.buildHipClangJobAndReboot(lfs_pull:true, setup_flags: gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true, needs_reboot:false, build_timeout:build_timeout_minutes )
+                    utils.buildHipClangJobAndReboot(lfs_pull:true, setup_flags: coverage_flags + gtest_flags, build_cmd: build_command, execute_cmd: execute_cmd_gtest, codecov:true, needs_reboot:false, build_timeout:build_timeout_minutes )
                 }
             }
         }

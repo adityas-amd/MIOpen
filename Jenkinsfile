@@ -972,7 +972,7 @@ pipeline {
                 gtest_flags = " -DMIOPEN_TEST_DISCRETE=OFF "
 
                 build_command = "LLVM_PATH=/opt/rocm/llvm make -j\$(nproc) miopen_gtest"
-                execute_cmd_gtest = "bin/miopen_gtest --gtest_filter=*FP32*:*NONE*-*DBSync*:*DeepBench*:*MIOpenTestConv*:*MIOpenDriver*:*GPU_GetitemBwd*.GetitemBwdTest*:*GPU_BNBWDSerialRun3D*:*GPU_BNFWDTrainSerialRun3D*:*GPU_Bwd_Mha*:*GPU_Fwd_Mha*:*GPU_UnitTestActivationDescriptor*"
+                execute_cmd_gtest = "bin/miopen_gtest --gtest_filter=*FP32*:*NONE*-*DBSync*:*DeepBench*:*MIOpenTestConv*:*MIOpenDriver*:*GPU_GetitemBwd*.GetitemBwdTest*:*GPU_BNBWDSerialRun3D*:*GPU_BNFWDTrainSerialRun3D*:*GPU_Bwd_Mha*:*GPU_Fwd_Mha*:*GPU_UnitTestActivationDescriptor*:*CPU_Dump*"
                 // execute_cmd_gtest = "python3 ../gtest-parallel/gtest-parallel-master/gtest-parallel ./bin/miopen_gtest --gtest_filter=*FP32*:*NONE*-*DBSync*:*DeepBench*:*MIOpenTestConv* --workers=4 --serialize_test_cases"
 
                 build_timeout_minutes = 10080 // 1 week

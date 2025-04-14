@@ -173,15 +173,13 @@ def cmake_build(Map conf=[:]){
             /opt/rocm/llvm/bin/llvm-profdata merge -sparse ./*.profraw -o ./miopen.profdata
             /opt/rocm/llvm/bin/llvm-cov report -object ./lib/libMIOpen.so -instr-profile=./miopen.profdata > ./code_cov_miopen.report
             cat ./code_cov_miopen.report
-            /opt/rocm/llvm/bin/llvm-cov show -Xdemangler=/opt/rocm/llvm/bin/llvm-cxxfilt -object ./lib/libMIOpen.so -instr-profile=./miopen.profdata > ./code_cov_miopen.txt
-            cat ./code_cov_miopen.txt
+            /opt/rocm/llvm/bin/llvm-cov show -Xdemangler=/opt/rocm/llvm/bin/llvm-cxxfilt -object ./lib/libMIOpen.so -instr-profile=./miopen.profdata --format=html --output-dir=./miopen_coverage_html
+            tar cvzf miopen_coverage_html.tar.gz miopen_coverage_html
         """
 
         sh coverage_profdata
-
         archiveArtifacts artifacts: "build/code_cov_miopen.report", allowEmptyArchive: true, fingerprint: true
-        archiveArtifacts artifacts: "build/code_cov_miopen.txt", allowEmptyArchive: true, fingerprint: true
-
+        archiveArtifacts artifacts: "build/miopen_coverage_html.tar.gz", allowEmptyArchive: true, fingerprint: true
     }
 }
 
